@@ -14,7 +14,7 @@ THE_KEY = os.environ['FLASK_KEY']
 app = Flask(__name__)
 
 def crossdomain(origin=None, methods=None, headers=None,
-                max_age=21600, attach_to_all=True,
+                max_age_seconds=6*60*60, attach_to_all=True,
                 automatic_options=True):
     if methods is not None:
         methods = ', '.join(sorted(x.upper() for x in methods))
@@ -45,7 +45,7 @@ def crossdomain(origin=None, methods=None, headers=None,
 
             h['Access-Control-Allow-Origin'] = origin
             h['Access-Control-Allow-Methods'] = get_methods()
-            h['Access-Control-Max-Age'] = str(max_age)
+            h['Access-Control-Max-Age'] = str(max_age_seconds)
             if headers is not None:
                 h['Access-Control-Allow-Headers'] = headers
             return resp
@@ -64,7 +64,8 @@ def submit_project():
         resp.headers['Content-Type'] = 'application/json'
         return resp
     else:
-        return make_response('The URL you submitted, %s, does not appear to be a valid Github repo' % project_url, HTTP_BAD_REQUEST)
+        return make_response('The URL you submitted, %s, does not '
+            'appear to be a valid Github repo' % project_url, HTTP_BAD_REQUEST)
 
 @app.route('/delete-project/', methods=['POST'])
 def delete_project():
