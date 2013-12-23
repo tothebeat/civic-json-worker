@@ -7,6 +7,11 @@ from datetime import datetime
 from git import Repo, GitCommandError
 from celery import Celery
 import requests
+from requests.options import (
+        OK as HTTP_OK, 
+        FORBIDDEN as HTTP_FORBIDDEN, 
+        NOT_FOUND as HTTP_NOT_FOUND,
+        )
 
 celery = Celery('tasks')
 celery.config_from_object('celeryconfig')
@@ -59,7 +64,7 @@ def build_user(user):
     user_info['html_url'] = repos[0]['html_url']
     headers = {'Authorization': 'token %s' % GITHUB_TOKEN}
     user_details = requests.get('%s/users/%s' % (GITHUB, user_info['login']), headers=headers)
-    if user_details.status_code == 200:
+    if user_details.status_code == HTTP_OK:
         user_info['name'] = user_details.json().get('name')
         user_info['company'] = user_details.json().get('company')
         user_info['blog'] = user_details.json().get('blog')
@@ -97,7 +102,7 @@ def update_project(project_url):
     url = '%s/repos/%s' % (GITHUB, full_name)
     headers = {'Authorization': 'token %s' % GITHUB_TOKEN}
     r = requests.get(url, headers=headers)
-    if r.status_code == 200:
+    if r.status_code == HTTP_OK:
         with open('data/projects.json', 'rb') as f:
             inp_list = list(set(json.loads(f.read())))
         inp = [l.rstrip('/') for l in inp_list]
@@ -131,7 +136,7 @@ def update_project(project_url):
         detail['contributors'] = []
         if detail.get('contributors_url'):
             r = requests.get(detail.get('contributors_url'), headers=headers)
-            if r.status_code == 200:
+            if r.status_code == HTTP_OK:
                 for contributor in r.json():
                     cont = {}
                     login = contributor.get('login')
@@ -146,10 +151,10 @@ def update_project(project_url):
                     cont['contributions'] = contributor.get('contributions')
                     detail['contributors'].append(cont)
         part = requests.get('%s/stats/participation' % url, headers=headers)
-        if part.status_code == 200:
+        if part.status_code == HTTP_OK:
             detail['participation'] = part.json()['all']
         return detail
-    elif r.status_code == 404:
+    elif r.status_code == HTTP_NOT_FOUND:
         # Can't find the project on gitub so scrub it from the list
         with open('data/projects.json', 'rb') as f:
             projects = json.loads(f.read())
@@ -157,5 +162,5 @@ def update_project(project_url):
         with open('data/projects.json', 'wb') as f:
             f.write(json.dumps(projects, indent=4))
         return None
-    elif r.status_code == 403: 
+    elif r.status_code == HTTP_FORBIDDEN: 
         raise IOError('Over rate limit')

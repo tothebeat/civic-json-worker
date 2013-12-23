@@ -4,6 +4,9 @@ import json
 import os
 from flask import Flask, make_response, request, current_app
 import requests
+from requests.options import (
+        BAD_REQUEST as HTTP_BAD_REQUEST,
+        )
 from tasks import update_project, update_projects as update_pjs_task
 
 THE_KEY = os.environ['FLASK_KEY']
@@ -61,7 +64,7 @@ def submit_project():
         resp.headers['Content-Type'] = 'application/json'
         return resp
     else:
-        return make_response('The URL you submitted, %s, does not appear to be a valid Github repo' % project_url, 400)
+        return make_response('The URL you submitted, %s, does not appear to be a valid Github repo' % project_url, HTTP_BAD_REQUEST)
 
 @app.route('/delete-project/', methods=['POST'])
 def delete_project():
@@ -75,9 +78,9 @@ def delete_project():
                 f.write(json.dumps(projects))
             resp = make_response('Deleted %s' % project_url)
         except ValueError:
-            resp = make_response('%s is not in the registry', 400)
+            resp = make_response('%s is not in the registry', HTTP_BAD_REQUEST)
     else:
-        resp = make_response("I can't do that Dave", 400)
+        resp = make_response("I can't do that Dave", HTTP_BAD_REQUEST)
     return resp
 
 @app.route('/update-projects/', methods=['GET'])
