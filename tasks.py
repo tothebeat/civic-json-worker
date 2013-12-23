@@ -24,7 +24,7 @@ def update_projects():
             pj_details = update_project(project_url)
         except IOError:
             return 'Github is throttling. Just gonna try again after limit is reset.'
-        if pj_details:
+        else:
             details.append(pj_details)
     with open('data/project_details.json', 'wb') as f:
         f.write(json.dumps(details, indent=4))
