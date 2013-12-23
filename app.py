@@ -67,14 +67,12 @@ def submit_project():
 def delete_project():
     if request.form.get('the_key') == THE_KEY:
         project_url = request.form.get('project_url')
-        f = open('data/projects.json', 'rb')
-        projects = json.loads(f.read())
-        f.close()
+        with open('data/projects.json', 'rb') as f:
+            projects = json.loads(f.read())
         try:
             projects.remove(project_url)
-            f = open('data/projects.json', 'wb')
-            f.write(json.dumps(projects))
-            f.close()
+            with open('data/projects.json', 'wb') as f:
+                f.write(json.dumps(projects))
             resp = make_response('Deleted %s' % project_url)
         except ValueError:
             resp = make_response('%s is not in the registry', 400)
