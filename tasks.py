@@ -18,6 +18,7 @@ celery.config_from_object('celeryconfig')
 
 GITHUB = 'https://api.github.com'
 GITHUB_TOKEN = os.environ['GITHUB_TOKEN']
+GITHUB_BACKUP_ACCOUNT = "eric.vanzanten@gmail.com"
 
 @celery.task
 def update_projects():
@@ -47,7 +48,7 @@ def backup_data():
     repo = Repo(repo_path)
     g = repo.git
     g.add(repo_path)
-    g.commit(message="Backed up at %s" % datetime.now().isoformat(), author="eric.vanzanten@gmail.com")
+    g.commit(message="Backed up at %s" % datetime.now().isoformat(), author=GITHUB_BACKUP_ACCOUNT)
     g.push()
     return None
 
