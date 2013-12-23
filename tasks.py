@@ -1,12 +1,12 @@
 import os
 import json
-from celery import Celery
-import requests
 from urlparse import urlparse
 from operator import itemgetter
 from itertools import groupby
-from git import Repo, GitCommandError
 from datetime import datetime
+from git import Repo, GitCommandError
+from celery import Celery
+import requests
 
 celery = Celery('tasks')
 celery.config_from_object('celeryconfig')

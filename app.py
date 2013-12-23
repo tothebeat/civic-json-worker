@@ -1,8 +1,8 @@
-from flask import Flask, make_response, request, current_app
 from datetime import timedelta
 from functools import update_wrapper
 import json
 import os
+from flask import Flask, make_response, request, current_app
 import requests
 from tasks import update_project, update_projects as update_pjs_task
 
